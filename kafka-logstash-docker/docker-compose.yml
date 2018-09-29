@@ -1,0 +1,51 @@
+version: '2'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    ports:
+      - "2181:2181"
+    container_name: zookeeper
+  kafka:
+    image: wurstmeister/kafka:0.11.0.1
+    ports:
+      - "9092:9092"
+    environment:
+      # The below only works for a macOS environment if you installed Docker for
+      # Mac. If your Docker engine is using another platform/OS, please refer to
+      # the relevant documentation with regards to finding the Host IP address
+      # for your platform.
+      KAFKA_ADVERTISED_HOST_NAME: docker.for.mac.localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "logstash_logs:1:1"
+    links:
+      - zookeeper
+    depends_on:
+      - zookeeper
+    container_name: kafka
+  logstash:
+    image: docker.elastic.co/logstash/logstash:5.6.3
+    ports:
+      - "10000:10000"
+    links:
+      - kafka
+    volumes:
+      - ./logstash_settings/:/usr/share/logstash/config/
+      - ./logstash_pipeline/:/usr/share/logstash/pipeline/
+    container_name: logstash
+  elasticsearch:
+    image: elasticsearch:latest
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    container_name: elasticsearch
+  kibana:
+    image: kibana:latest
+    ports:
+      - "5601:5601"
+    links:
+      - elasticsearch
+    container_name: kibana
+networks:
+  default:
+    external:
+      name: kafka-logstash-docker_default

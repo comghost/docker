@@ -32,19 +32,19 @@ services:
       - ./logstash_settings/:/usr/share/logstash/config/
       - ./logstash_pipeline/:/usr/share/logstash/pipeline/
     container_name: logstash
-  elasticsearch:
-    image: elasticsearch:latest
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    container_name: elasticsearch
-  kibana:
-    image: kibana:latest
-    ports:
-      - "5601:5601"
-    links:
-      - elasticsearch
-    container_name: kibana
+  # elasticsearch:
+  #   image: elasticsearch:latest
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
+  #   container_name: elasticsearch
+  # kibana:
+  #   image: kibana:latest
+  #   ports:
+  #     - "5601:5601"
+  #   links:
+  #     - elasticsearch
+  #   container_name: kibana
 networks:
   default:
     external:

@@ -37,20 +37,33 @@ services:
       - ./logstash_pipeline1/:/usr/share/logstash/pipeline/
       - /EGOV/eclipse-jee-oxygen/workspace/.metadata/.plugins/org.eclipse.wst.server.core/tmp1/logs/:/usr/share/logstash/logs/
     container_name: logstash_1st
-  # elasticsearch_log:
-  #   image: elasticsearch:latest
-  #   ports:
-  #     - "9200:9200"
-  #     - "9300:9300"
-  #   container_name: elasticsearch_log
-  # kibana_log:
-  #   image: kibana:latest
-  #   ports:
-  #     - "5601:5601"
-  #   links:
-  #     - elasticsearch_log
-  #     - elasticsearch_log:elasticsearch
-  #   container_name: kibana_log
+  logstash_2nd:
+    image: docker.elastic.co/logstash/logstash:5.6.3
+    ports:
+      - "20000:20000"
+    links:
+      - kafka_log
+      - kafka_log:kafka
+      - elasticsearch_log
+      - elasticsearch_log:elasticsearch
+    volumes:
+      - ./logstash_settings2/:/usr/share/logstash/config/
+      - ./logstash_pipeline2/:/usr/share/logstash/pipeline/
+    container_name: logstash_2nd
+  elasticsearch_log:
+    image: elasticsearch:latest
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    container_name: elasticsearch_log
+  kibana_log:
+    image: kibana:latest
+    ports:
+      - "5601:5601"
+    links:
+      - elasticsearch_log
+      - elasticsearch_log:elasticsearch
+    container_name: kibana_log
 networks:
   default:
     external:
